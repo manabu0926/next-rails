@@ -19,7 +19,6 @@ jobs:
     executor: setup
     steps:
       - checkout
-
       - run:
           name: Copy Environments
           command: cp ./api/.env.default ./api/.env
@@ -32,15 +31,17 @@ jobs:
           key: gem-cache-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
           paths:
             - ./api/vendor/bundle
+      - persist_to_workspace:
+          root: ./api
   rubocop:
     executor: setup
     steps:
       - checkout
+      - attach_workspace:
+          at: ./api
       - run:
           name: Run rubocop
-          command: |
-            cd api
-            bundle exec rubocop --parallel
+          command: bundle exec rubocop --parallel
   rspec:
     executor: setup
     steps:
