@@ -16,8 +16,7 @@ executor:
           MYSQL_ROOT_PASSWORD: password
 jobs:
   build:
-    executor:
-      name: default
+    executor: default
     steps:
       - checkout
       - restore_cache:
@@ -26,6 +25,9 @@ jobs:
             # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
       - run:
+          name: Copy Environments
+          command: cp .env.default .env
+      - run:
           name: bundle install
           command: bundle install -j4
       - save_cache:
@@ -33,16 +35,14 @@ jobs:
           paths:
             - ./vendor/bundle
   rubocop:
-    executor:
-      name: default
+    executor: default
     steps:
       - checkout
       - run:
           name: Run rubocop
           command: bundle exec rubocop --parallel
   rspec:
-    executor:
-      name: default
+    executor: default
     steps:
       - checkout
       - run:
