@@ -36,14 +36,18 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: ./api
+          at: .
       - run:
           name: Run rubocop
-          command: bundle exec rubocop --parallel
+          command: |
+            cd api
+            bundle exec rubocop --parallel
   rspec:
     executor: setup
     steps:
       - checkout
+      - attach_workspace:
+          at: .
       - run:
           name: wait mysql
           command: dockerize -wait tcp://127.0.0.1:3306 -timeout 120s
