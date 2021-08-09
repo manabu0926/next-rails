@@ -3,7 +3,7 @@ executors:
   setup:
     working_directory: ~/repo
     docker:
-      - image: circleci/ruby:3.0.1-browsers
+      - image: circleci/ruby:3.0.2-browsers
         environment:
           BUNDLER_VERSION: 2.1.4
           RAILS_ENV: test
@@ -19,13 +19,6 @@ jobs:
     executor: setup
     steps:
       - checkout
-      - restore_cache:
-          paths:
-            - ./api
-          keys:
-            - gem-cache-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
-            # checksumが変わった時はこちら↓が使われます。
-            - v1-dependencies-
       - run:
           name: Copy Environments
           command: cp ./api/.env.default ./api/.env
@@ -34,10 +27,6 @@ jobs:
           command: |
             cd api
             bundle install -j4
-      - save_cache:
-          key: gem-cache-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
-          paths:
-            - ./api/vendor/bundle
   rubocop:
     executor: setup
     steps:
