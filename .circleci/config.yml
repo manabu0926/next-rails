@@ -19,6 +19,9 @@ jobs:
     executor: setup
     steps:
       - checkout
+      - run:
+          name: move folder
+          command: cd api
       - restore_cache:
           keys:
             - gem-cache-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
