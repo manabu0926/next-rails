@@ -21,44 +21,44 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-        keys:
-          - v1-dependencies-{{ checksum "Gemfile.lock" }}
-          # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-
+          keys:
+            - v1-dependencies-{{ checksum "Gemfile.lock" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
       - run:
-        name: bundle install
-        command: bundle install -j4
+          name: bundle install
+          command: bundle install -j4
       - save_cache:
-        key: gem-cache-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
-        paths:
-          - ./vendor/bundle
+          key: gem-cache-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
+          paths:
+            - ./vendor/bundle
   rubocop:
     executor:
       name: default
     steps:
       - checkout
       - run:
-        name: Run rubocop
-        command: bundle exec rubocop --parallel
+          name: Run rubocop
+          command: bundle exec rubocop --parallel
   rspec:
     executor:
       name: default
     steps:
       - checkout
       - run:
-        name: wait mysql
-        command: dockerize -wait tcp://127.0.0.1:3306 -timeout 120s
+          name: wait mysql
+          command: dockerize -wait tcp://127.0.0.1:3306 -timeout 120s
       - run:
-        name: create database
-        command: bundle exec rake db:create
+          name: create database
+          command: bundle exec rake db:create
       - run:
-        name: migrate
-        command: bundle exec rails db:migrate
+          name: migrate
+          command: bundle exec rails db:migrate
       - run:
-        name: Rspec
-        command: bundle exec rspec
+          name: Rspec
+          command: bundle exec rspec
       - store_test_results:
-        path: /tmp/test-results
+          path: /tmp/test-results
 
 workflows:
   version: 2
