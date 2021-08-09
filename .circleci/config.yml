@@ -33,6 +33,8 @@ jobs:
             - ./api/vendor/bundle
       - persist_to_workspace:
           root: ./api
+          paths:
+            - vendor/bundle
   rubocop:
     executor: setup
     steps:
