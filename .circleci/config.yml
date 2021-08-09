@@ -1,7 +1,7 @@
 version: 2.1
 executors:
   setup:
-    working_directory: ~/repo
+    working_directory: ~/repo/api
     docker:
       - image: circleci/ruby:3.0.1-browsers
         environment:
@@ -19,9 +19,6 @@ jobs:
     executor: setup
     steps:
       - checkout
-      - run:
-          name: move folder
-          command: cd api
       - restore_cache:
           keys:
             - gem-cache-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
