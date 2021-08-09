@@ -21,12 +21,10 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "Gemfile.lock" }}
-            # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
+            - gem-cache-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
       - run:
           name: Copy Environments
-          command: cp .env.default .env
+          command: cp ./api/.env.default ./api/.env
       - run:
           name: bundle install
           command: bundle install -j4
