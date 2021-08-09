@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 class PostsController < ApplicationController
-  before_action :set_post, only: [:show, :update, :destroy]
+  before_action :set_post, only: %i[show update destroy]
 
   # GET /posts
   def index
@@ -18,9 +20,9 @@ class PostsController < ApplicationController
     @post = Post.new(post_params)
 
     if @post.save
-      render json: @post, status: :created, location: @post
+      render json: @post, status: 201, location: @post
     else
-      render json: @post.errors, status: :unprocessable_entity
+      render json: @post.errors, status: 422
     end
   end
 
@@ -29,7 +31,7 @@ class PostsController < ApplicationController
     if @post.update(post_params)
       render json: @post
     else
-      render json: @post.errors, status: :unprocessable_entity
+      render json: @post.errors, status: 422
     end
   end
 
@@ -39,13 +41,14 @@ class PostsController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_post
-      @post = Post.find(params[:id])
-    end
 
-    # Only allow a list of trusted parameters through.
-    def post_params
-      params.require(:post).permit(:title)
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_post
+    @post = Post.find(params[:id])
+  end
+
+  # Only allow a list of trusted parameters through.
+  def post_params
+    params.require(:post).permit(:title)
+  end
 end
