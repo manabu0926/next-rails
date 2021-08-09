@@ -19,6 +19,10 @@ jobs:
     executor: setup
     steps:
       - checkout
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./api/vendor/bundle
       - run:
           name: Copy Environments
           command: cp ./api/.env.default ./api/.env
@@ -27,14 +31,6 @@ jobs:
           command: |
             cd api
             bundle install -j4
-      - save_cache:
-          key: gem-cache-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
-          paths:
-            - ./api/vendor/bundle
-      - persist_to_workspace:
-          root: ./api
-          paths:
-            - vendor/bundle
   rubocop:
     executor: setup
     steps:
