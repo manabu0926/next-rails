@@ -89,11 +89,7 @@ workflows:
   version: 2
   main:
     jobs:
-      - build
-      - rubocop:
-          requires:
-            - build
+      - rubocop
       - rspec:
           requires:
-            - build
             - rubocop
