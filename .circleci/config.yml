@@ -1,6 +1,6 @@
 version: 2.1
 executor:
-  default:
+  setup:
     working_directory: ~/repo
     docker:
       - image: circleci/ruby:3.0.1-browsers
@@ -16,7 +16,7 @@ executor:
           MYSQL_ROOT_PASSWORD: password
 jobs:
   build:
-    executor: default
+    executor: setup
     steps:
       - checkout
       - restore_cache:
@@ -35,14 +35,14 @@ jobs:
           paths:
             - ./vendor/bundle
   rubocop:
-    executor: default
+    executor: setup
     steps:
       - checkout
       - run:
           name: Run rubocop
           command: bundle exec rubocop --parallel
   rspec:
-    executor: default
+    executor: setup
     steps:
       - checkout
       - run:
