@@ -1,5 +1,5 @@
 version: 2.1
-executor:
+executors:
   setup:
     working_directory: ~/repo
     docker:
