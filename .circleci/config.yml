@@ -1,6 +1,6 @@
 version: 2.1
 executors:
-  setup:
+  default:
     working_directory: ~/repo
     docker:
       - image: circleci/ruby:3.0.2-browsers
@@ -16,9 +16,15 @@ executors:
           MYSQL_ROOT_PASSWORD: password
 jobs:
   build:
-    executor: setup
+    executor:
+      name: default
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "Gemfile.lock" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
       - run:
           name: Copy Environments
           command: cp ./api/.env.default ./api/.env
@@ -28,15 +34,16 @@ jobs:
             cd api
             bundle install --jobs=4 --retry=3 --path vendor/bundle
       - save_cache:
-          key: gem-cache-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
+          key: v1-dependencies-{{ checksum "Gemfile.lock" }}
           paths:
             - ~repo/api/vendor/bundle
       - persist_to_workspace:
           root: .
           paths:
-            - ./api/vendor/bundle
+            - api/vendor/bundle
   rubocop:
-    executor: setup
+    executor:
+      name: default
     steps:
       - checkout
       - attach_workspace:
@@ -47,7 +54,8 @@ jobs:
             cd api
             bundle exec rubocop --parallel
   rspec:
-    executor: setup
+    executor:
+      name: default
     steps:
       - checkout
       - attach_workspace:
