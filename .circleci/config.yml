@@ -2,7 +2,6 @@ version: 2.1
 executors:
   setup:
     working_directory: ~/repo
-    root: ./api
     docker:
       - image: circleci/ruby:3.0.1-browsers
         environment:
@@ -21,27 +20,33 @@ jobs:
     steps:
       - checkout
       - restore_cache:
+          paths:
+            - ./api
           keys:
             - gem-cache-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
             # checksumが変わった時はこちら↓が使われます。
             - v1-dependencies-
       - run:
           name: Copy Environments
-          command: cp .env.default .env
+          command: cp ./api/.env.default ./api/.env
       - run:
           name: bundle install
-          command: bundle install -j4
+          command: |
+            cd api
+            bundle install -j4
       - save_cache:
           key: gem-cache-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
           paths:
-            - ./vendor/bundle
+            - ./api/vendor/bundle
   rubocop:
     executor: setup
     steps:
       - checkout
       - run:
           name: Run rubocop
-          command: bundle exec rubocop --parallel
+          command: |
+            cd api
+            bundle exec rubocop --parallel
   rspec:
     executor: setup
     steps:
@@ -57,9 +62,11 @@ jobs:
           command: bundle exec rails db:migrate
       - run:
           name: Rspec
-          command: bundle exec rspec
+          command: |
+            cd api
+            bundle exec rspec
       - store_test_results:
-          path: /tmp/test-results
+          path: ./api/tmp/test-results
 
 workflows:
   version: 2
