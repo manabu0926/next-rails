@@ -19,10 +19,6 @@ jobs:
     executor: setup
     steps:
       - checkout
-      - persist_to_workspace:
-          root: .
-          paths:
-            - ./api/vendor/bundle
       - run:
           name: Copy Environments
           command: cp ./api/.env.default ./api/.env
@@ -30,7 +26,11 @@ jobs:
           name: bundle install
           command: |
             cd api
-            bundle install -j4
+            bundle install --jobs=4 --retry=3 --path vendor/bundle
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./api/vendor/bundle
   rubocop:
     executor: setup
     steps:
