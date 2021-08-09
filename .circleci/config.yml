@@ -15,7 +15,7 @@ executors:
         environment:
           MYSQL_ROOT_PASSWORD: password
 jobs:
-  build:
+  rubocop:
     executor:
       name: default
     steps:
@@ -37,17 +37,6 @@ jobs:
           key: v1-dependencies-{{ checksum "Gemfile.lock" }}
           paths:
             - ~repo/api/vendor/bundle
-      - persist_to_workspace:
-          root: .
-          paths:
-            - api/vendor/bundle
-  rubocop:
-    executor:
-      name: default
-    steps:
-      - checkout
-      - attach_workspace:
-          at: ./api
       - run:
           name: Run rubocop
           command: |
@@ -58,17 +47,36 @@ jobs:
       name: default
     steps:
       - checkout
-      - attach_workspace:
-          at: ./api
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "Gemfile.lock" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+      - run:
+          name: Copy Environments
+          command: cp ./api/.env.default ./api/.env
+      - run:
+          name: bundle install
+          command: |
+            cd api
+            bundle install --jobs=4 --retry=3 --path vendor/bundle
+      - save_cache:
+          key: v1-dependencies-{{ checksum "Gemfile.lock" }}
+          paths:
+            - ~repo/api/vendor/bundle
       - run:
           name: wait mysql
           command: dockerize -wait tcp://127.0.0.1:3306 -timeout 120s
       - run:
           name: create database
-          command: bundle exec rake db:create
+          command: |
+            cd api
+            bundle exec rake db:create
       - run:
           name: migrate
-          command: bundle exec rails db:migrate
+          command: |
+            cd api
+            bundle exec rails db:migrate
       - run:
           name: Rspec
           command: |
