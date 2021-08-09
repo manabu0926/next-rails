@@ -27,6 +27,10 @@ jobs:
           command: |
             cd api
             bundle install --jobs=4 --retry=3 --path vendor/bundle
+      - save_cache:
+          key: gem-cache-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
+          paths:
+            - ~repo/api/vendor/bundle
       - persist_to_workspace:
           root: .
           paths:
