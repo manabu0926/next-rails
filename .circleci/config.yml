@@ -34,7 +34,7 @@ jobs:
             cd api
             bundle install --jobs=4 --retry=3 --path vendor/bundle
       - save_cache:
-          key: v1-dependencies-{{ checksum "Gemfile.lock" }}
+          key: v1-dependencies-{{ checksum "api/Gemfile.lock" }}
           paths:
             - ~repo/api/vendor/bundle
       - run:
@@ -49,7 +49,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "Gemfile.lock" }}
+            - v1-dependencies-{{ checksum "api/Gemfile.lock" }}
             # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
       - run:
